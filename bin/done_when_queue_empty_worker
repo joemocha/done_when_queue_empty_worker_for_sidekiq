@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+
+require 'sidekiq'
+require 'sidekiq/cli'
+
+Sidekiq::CLI.instance
+begin
+  cli = Sidekiq::CLI.instance
+  cli.parse
+  require_relative '../lib/done_when_queue_empty_worker_for_sidekiq/fetcher_patch'
+  cli.run
+rescue => e
+  raise e if $DEBUG
+  STDERR.puts e.message
+  STDERR.puts e.backtrace.join("\n")
+  exit 1
+end
